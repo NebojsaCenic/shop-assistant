@@ -6,7 +6,9 @@
   </div>
 
   @if (errorMessage(); as message) {
-    <p class="message error-message" role="alert">{{ message }}</p>
+    @if (!addingSubcategoryTo()) {
+      <p class="message error-message" role="alert">{{ message }}</p>
+    }
   }
   @if (successMessage(); as message) {
     <p class="message success-message" role="status">{{ message }}</p>
@@ -291,6 +293,9 @@
                   </button>
                 </div>
               </form>
+              @if (errorMessage(); as message) {
+                <p class="message error-message subcategory-feedback" role="alert">{{ message }}</p>
+              }
             } @else {
               <button
                 class="add-subcategory-button"

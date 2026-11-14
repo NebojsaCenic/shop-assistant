@@ -147,6 +147,8 @@ export class CategoriesPage implements OnInit {
     }
 
     this.clearPendingActions();
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
     this.addingSubcategoryTo.set(categoryId);
     this.newSubcategoryName.reset('');
   }

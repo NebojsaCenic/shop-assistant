@@ -119,6 +119,21 @@ describe('CategoryService', () => {
     expect(insertedRow).toEqual({ user_id: 'owner-id', name: 'Hrana' });
   });
 
+  it('creates a trimmed subcategory under the authenticated owner and category', async () => {
+    const result = await TestBed.inject(CategoryService).createSubcategory(
+      'category-id',
+      '  Mlečni proizvodi  ',
+    );
+
+    expect(result).toEqual({ success: true, data: { id: 'category-id' } });
+    expect(from).toHaveBeenCalledWith('subcategories');
+    expect(insertedRow).toEqual({
+      user_id: 'owner-id',
+      category_id: 'category-id',
+      name: 'Mlečni proizvodi',
+    });
+  });
+
   it('rejects whitespace-only category names without making a request', async () => {
     const result = await TestBed.inject(CategoryService).createCategory('   ');
 
