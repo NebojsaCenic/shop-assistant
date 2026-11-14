@@ -1,0 +1,180 @@
+<section class="shopping-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">JEDNOSTAVNA LISTA</p>
+      <h1>Kupovina</h1>
+      <p class="description">Izaberi proizvode iz svoje kolekcije i prati šta si već kupila.</p>
+    </div>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+  @if (successMessage(); as message) {
+    <p class="message success-message" role="status">{{ message }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="loading-state" role="status">Učitavanje liste za kupovinu…</p>
+  } @else if (!hasLoadedData()) {
+    <button class="secondary-button retry-button" type="button" (click)="loadData()">
+      Pokušaj ponovo
+    </button>
+  } @else {
+    <section class="checklist-section" aria-labelledby="checklist-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="checklist-heading">Tvoja lista</h2>
+          @if (items().length > 0) {
+            <p class="list-progress" role="status">
+              Kupljeno {{ purchasedCount() }} od {{ productCountLabel(items().length) }}
+            </p>
+          }
+        </div>
+        @if (items().length > 0 && !isClearConfirmationOpen()) {
+          <button
+            class="delete-button"
+            type="button"
+            [disabled]="isMutating()"
+            (click)="requestClearList()"
+          >
+            Isprazni listu
+          </button>
+        }
+      </div>
+
+      @if (items().length === 0) {
+        <div class="empty-state">
+          <h3>Tvoja lista za kupovinu je prazna.</h3>
+          <p>Dodaj proizvode iz svoje kolekcije i označi ih kada ih kupiš.</p>
+        </div>
+      } @else {
+        <ul class="checklist">
+          @for (entry of checklistEntries(); track entry.item.id) {
+            <li class="checklist-item" [class.is-purchased]="entry.item.isPurchased">
+              <label class="purchase-toggle">
+                <input
+                  type="checkbox"
+                  [attr.aria-label]="'Označi ' + entry.product.name + ' kao kupljen'"
+                  [checked]="entry.item.isPurchased"
+                  [disabled]="isMutating()"
+                  (change)="onPurchasedChange(entry.item, $event)"
+                />
+              </label>
+              <div class="checklist-product">
+                <span class="checklist-product-name">{{ entry.product.name }}</span>
+                <span class="checklist-product-category">{{ entry.category.name }}</span>
+                @if (entry.product.brand) {
+                  <span class="checklist-product-brand">{{ entry.product.brand }}</span>
+                }
+              </div>
+              <button
+                class="secondary-button remove-button"
+                type="button"
+                [disabled]="isMutating()"
+                [attr.aria-label]="'Ukloni ' + entry.product.name + ' sa liste'"
+                (click)="removeItem(entry.item)"
+              >
+                Ukloni
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (isClearConfirmationOpen()) {
+        <div class="confirmation-panel" role="alertdialog" aria-label="Potvrda pražnjenja liste">
+          <p>
+            Da li sigurno želiš da isprazniš listu za kupovinu? Sačuvani proizvodi neće biti
+            obrisani.
+          </p>
+          <div class="button-row">
+            <button
+              class="delete-button"
+              type="button"
+              [disabled]="isMutating()"
+              (click)="clearList()"
+            >
+              Isprazni listu
+            </button>
+            <button
+              class="secondary-button"
+              type="button"
+              [disabled]="isMutating()"
+              (click)="cancelClearList()"
+            >
+              Odustani
+            </button>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="product-picker" aria-labelledby="product-picker-heading">
+      <div class="section-heading picker-heading">
+        <div>
+          <h2 id="product-picker-heading">Dodaj proizvode</h2>
+          <p class="list-progress">Izaberi proizvode iz kolekcije po kategorijama.</p>
+        </div>
+      </div>
+
+      @if (products().length === 0) {
+        <div class="empty-state">
+          <h3>Još uvek nemaš dodatih proizvoda.</h3>
+          <p>Najpre dodaj proizvode u svoju kolekciju, pa ih zatim izaberi za kupovinu.</p>
+          <a class="primary-button" routerLink="/proizvodi">Otvori proizvode</a>
+        </div>
+      } @else if (availableProductGroups().length === 0) {
+        <div class="empty-state">
+          <h3>Svi proizvodi iz kolekcije su na listi.</h3>
+          <p>Svaki proizvod može da se pojavi samo jednom na listi za kupovinu.</p>
+        </div>
+      } @else {
+        <div class="category-groups">
+          @for (group of availableProductGroups(); track group.category.id) {
+            <section class="category-group">
+              <button
+                class="category-toggle"
+                type="button"
+                [attr.aria-expanded]="!isCategoryCollapsed(group.category.id)"
+                [attr.aria-controls]="
+                  !isCategoryCollapsed(group.category.id) ? 'available-' + group.category.id : null
+                "
+                (click)="toggleCategory(group.category.id)"
+              >
+                <span class="category-name">{{ group.category.name }}</span>
+                <span class="category-count">{{ productCountLabel(group.products.length) }}</span>
+                <span class="toggle-indicator" aria-hidden="true">
+                  {{ isCategoryCollapsed(group.category.id) ? '+' : '−' }}
+                </span>
+              </button>
+
+              @if (!isCategoryCollapsed(group.category.id)) {
+                <ul class="available-products" [id]="'available-' + group.category.id">
+                  @for (product of group.products; track product.id) {
+                    <li class="available-product">
+                      <div class="available-product-info">
+                        <span class="available-product-name">{{ product.name }}</span>
+                        @if (product.brand) {
+                          <span class="available-product-brand">{{ product.brand }}</span>
+                        }
+                      </div>
+                      <button
+                        class="secondary-button add-button"
+                        type="button"
+                        [disabled]="isMutating()"
+                        (click)="addProduct(product)"
+                      >
+                        Dodaj
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          }
+        </div>
+      }
+    </section>
+  }
+</section>

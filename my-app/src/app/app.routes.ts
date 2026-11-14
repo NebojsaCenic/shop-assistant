@@ -41,13 +41,8 @@ export const routes: Routes = [
       },
       {
         path: 'kupovina',
-        loadComponent: placeholderPage,
-        data: {
-          eyebrow: 'JEDNOSTAVNA LISTA',
-          title: 'Kupovina',
-          description: 'Sastavi listu za kupovinu od proizvoda iz svoje kolekcije.',
-          notice: 'Lista za kupovinu stiže nakon povezivanja kolekcije proizvoda.',
-        },
+        loadComponent: () =>
+          import('./features/shopping/shopping-page').then((module) => module.ShoppingPage),
       },
       {
         path: 'profil',
