@@ -33,13 +33,22 @@ export class CategoriesPage implements OnInit {
     nonNullable: true,
     validators: [Validators.required, nonWhitespaceValidator],
   });
+  readonly categoryEditForm = this.formBuilder.group({
+    name: this.categoryEditName,
+  });
   readonly newSubcategoryName = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, nonWhitespaceValidator],
   });
+  readonly newSubcategoryForm = this.formBuilder.group({
+    name: this.newSubcategoryName,
+  });
   readonly subcategoryEditName = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, nonWhitespaceValidator],
+  });
+  readonly subcategoryEditForm = this.formBuilder.group({
+    name: this.subcategoryEditName,
   });
 
   ngOnInit(): void {

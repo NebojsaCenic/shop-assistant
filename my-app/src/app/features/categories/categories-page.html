@@ -57,12 +57,16 @@
         <article class="category-card">
           <div class="category-heading">
             @if (editingCategoryId() === category.id) {
-              <form class="edit-form" (ngSubmit)="saveCategory(category)">
+              <form
+                class="edit-form"
+                [formGroup]="categoryEditForm"
+                (ngSubmit)="saveCategory(category)"
+              >
                 <div class="form-field">
                   <label [for]="'edit-category-' + category.id">Naziv kategorije</label>
                   <input
                     [id]="'edit-category-' + category.id"
-                    [formControl]="categoryEditName"
+                    formControlName="name"
                     [attr.aria-invalid]="hasNameError(categoryEditName)"
                     [attr.aria-describedby]="
                       hasNameError(categoryEditName) ? 'edit-category-error-' + category.id : null
@@ -162,6 +166,7 @@
                     @if (editingSubcategoryId() === subcategory.id) {
                       <form
                         class="edit-form subcategory-edit-form"
+                        [formGroup]="subcategoryEditForm"
                         (ngSubmit)="saveSubcategory(subcategory)"
                       >
                         <div class="form-field">
@@ -170,7 +175,7 @@
                           </label>
                           <input
                             [id]="'edit-subcategory-' + subcategory.id"
-                            [formControl]="subcategoryEditName"
+                            formControlName="name"
                             [attr.aria-invalid]="hasNameError(subcategoryEditName)"
                             [attr.aria-describedby]="
                               hasNameError(subcategoryEditName)
@@ -260,12 +265,16 @@
             }
 
             @if (addingSubcategoryTo() === category.id) {
-              <form class="subcategory-form" (ngSubmit)="createSubcategory(category.id)">
+              <form
+                class="subcategory-form"
+                [formGroup]="newSubcategoryForm"
+                (ngSubmit)="createSubcategory(category.id)"
+              >
                 <div class="form-field">
                   <label [for]="'new-subcategory-' + category.id">Naziv potkategorije</label>
                   <input
                     [id]="'new-subcategory-' + category.id"
-                    [formControl]="newSubcategoryName"
+                    formControlName="name"
                     [attr.aria-invalid]="hasNameError(newSubcategoryName)"
                     [attr.aria-describedby]="
                       hasNameError(newSubcategoryName)

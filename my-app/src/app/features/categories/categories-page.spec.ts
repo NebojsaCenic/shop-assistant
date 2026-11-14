@@ -83,9 +83,11 @@ describe('CategoriesPage', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.newSubcategoryName.value).toBe('Mlečni proizvodi');
     expect(fixture.componentInstance.newSubcategoryName.valid).toBe(true);
-    form.triggerEventHandler('ngSubmit', null);
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    form.nativeElement.dispatchEvent(submitEvent);
     await fixture.whenStable();
 
+    expect(submitEvent.defaultPrevented).toBe(true);
     expect(categoryService.createSubcategory).toHaveBeenCalledWith(
       'category-id',
       'Mlečni proizvodi',
