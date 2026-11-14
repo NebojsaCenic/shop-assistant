@@ -36,13 +36,8 @@ export const routes: Routes = [
       },
       {
         path: 'proizvodi',
-        loadComponent: placeholderPage,
-        data: {
-          eyebrow: 'TVOJ KATALOG',
-          title: 'Proizvodi',
-          description: 'Pronađi i sačuvaj proizvode koje redovno kupuješ.',
-          notice: 'Tvoj katalog proizvoda stiže u narednoj fazi.',
-        },
+        loadComponent: () =>
+          import('./features/products/products-page').then((module) => module.ProductsPage),
       },
       {
         path: 'kupovina',

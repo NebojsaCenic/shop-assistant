@@ -1,0 +1,201 @@
+<section class="products-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">TVOJ KATALOG</p>
+      <h1>Proizvodi</h1>
+      <p class="description">
+        Sačuvaj proizvode koje redovno kupuješ i pronađi ih po kategorijama.
+      </p>
+    </div>
+    <button
+      class="primary-button"
+      type="button"
+      [disabled]="isLoading() || isMutating() || categories().length === 0"
+      (click)="openNewProductForm()"
+    >
+      + Dodaj proizvod
+    </button>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+  @if (successMessage(); as message) {
+    <p class="message success-message" role="status">{{ message }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="loading-state" role="status">Učitavanje proizvoda…</p>
+  } @else if (categories().length === 0 && errorMessage()) {
+    <button class="secondary-button retry-button" type="button" (click)="loadData()">
+      Pokušaj ponovo
+    </button>
+  } @else if (categories().length === 0) {
+    <div class="empty-state">
+      <h2>Prvo dodaj kategoriju.</h2>
+      <p>Svaki proizvod mora da pripada jednoj kategoriji.</p>
+      <a class="primary-button" routerLink="/kategorije">Otvori kategorije</a>
+    </div>
+  } @else {
+    @if (isFormOpen()) {
+      <app-product-form
+        [categories]="categories()"
+        [product]="editingProduct()"
+        (saved)="onProductSaved($event)"
+        (cancelled)="closeProductForm()"
+      />
+    }
+
+    @if (products().length === 0) {
+      <div class="empty-state">
+        <h2>Još uvek nemaš dodatih proizvoda.</h2>
+        <p>Dodaj prvi proizvod u svoju kolekciju.</p>
+        <button class="primary-button" type="button" (click)="openNewProductForm()">
+          Dodaj prvi proizvod
+        </button>
+      </div>
+    } @else {
+      <div class="search-field">
+        <label for="product-search">Pretraži po nazivu</label>
+        <input
+          id="product-search"
+          type="search"
+          autocomplete="off"
+          placeholder="Na primer: mleko"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+        />
+      </div>
+
+      @if (productGroups().length === 0) {
+        <div class="empty-state search-empty-state">
+          <h2>Nema proizvoda koji odgovaraju pretrazi.</h2>
+          <p>Pokušaj sa drugim nazivom proizvoda.</p>
+        </div>
+      } @else {
+        <div class="category-groups">
+          @for (group of productGroups(); track group.category.id) {
+            <section class="category-group">
+              <button
+                class="category-toggle"
+                type="button"
+                [attr.aria-expanded]="!isCategoryCollapsed(group.category.id)"
+                [attr.aria-controls]="
+                  !isCategoryCollapsed(group.category.id) ? 'products-' + group.category.id : null
+                "
+                (click)="toggleCategory(group.category.id)"
+              >
+                <span class="category-name">{{ group.category.name }}</span>
+                <span class="category-count">{{ productCountLabel(group.products.length) }}</span>
+                <span class="toggle-indicator" aria-hidden="true">
+                  {{ isCategoryCollapsed(group.category.id) ? '+' : '−' }}
+                </span>
+              </button>
+
+              @if (!isCategoryCollapsed(group.category.id)) {
+                <ul class="product-list" [id]="'products-' + group.category.id">
+                  @for (product of group.products; track product.id) {
+                    <li class="product-card">
+                      <div class="product-summary">
+                        <div class="product-name">
+                          <h2>{{ product.name }}</h2>
+                          @if (product.brand) {
+                            <p>{{ product.brand }}</p>
+                          }
+                        </div>
+                        <div class="product-actions">
+                          <button
+                            class="secondary-button"
+                            type="button"
+                            [attr.aria-expanded]="expandedProductId() === product.id"
+                            [attr.aria-controls]="
+                              expandedProductId() === product.id
+                                ? 'product-details-' + product.id
+                                : null
+                            "
+                            (click)="toggleProductDetails(product.id)"
+                          >
+                            {{ expandedProductId() === product.id ? 'Sakrij detalje' : 'Detalji' }}
+                          </button>
+                          <button
+                            class="secondary-button"
+                            type="button"
+                            [disabled]="isMutating()"
+                            (click)="openEditProductForm(product)"
+                          >
+                            Izmeni
+                          </button>
+                          <button
+                            class="delete-button"
+                            type="button"
+                            [disabled]="isMutating()"
+                            [attr.aria-label]="'Obriši proizvod ' + product.name"
+                            (click)="requestProductDeletion(product)"
+                          >
+                            Obriši
+                          </button>
+                        </div>
+                      </div>
+
+                      @if (expandedProductId() === product.id) {
+                        <dl class="product-details" [id]="'product-details-' + product.id">
+                          <dt>Kategorija</dt>
+                          <dd>{{ group.category.name }}</dd>
+                          @if (product.subcategoryId) {
+                            <dt>Potkategorija</dt>
+                            <dd>{{ subcategoryName(group.category, product.subcategoryId) }}</dd>
+                          }
+                          @if (product.brand) {
+                            <dt>Brend</dt>
+                            <dd>{{ product.brand }}</dd>
+                          }
+                          @if (product.notes) {
+                            <dt>Napomena</dt>
+                            <dd class="product-notes">{{ product.notes }}</dd>
+                          }
+                          <dt>Dodato</dt>
+                          <dd>{{ formatDate(product.createdAt) }}</dd>
+                        </dl>
+                      }
+
+                      @if (pendingDeleteId() === product.id) {
+                        <div
+                          class="confirmation-panel"
+                          role="alertdialog"
+                          [attr.aria-label]="'Potvrda brisanja proizvoda ' + product.name"
+                        >
+                          <p>
+                            Da li sigurno želiš da obrišeš proizvod „{{ product.name }}“ iz svoje
+                            kolekcije?
+                          </p>
+                          <div class="button-row">
+                            <button
+                              class="delete-button"
+                              type="button"
+                              [disabled]="isMutating()"
+                              (click)="deleteProduct(product)"
+                            >
+                              Obriši proizvod
+                            </button>
+                            <button
+                              class="secondary-button"
+                              type="button"
+                              [disabled]="isMutating()"
+                              (click)="cancelProductDeletion()"
+                            >
+                              Odustani
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          }
+        </div>
+      }
+    }
+  }
+</section>

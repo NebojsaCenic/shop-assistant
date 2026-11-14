@@ -2,6 +2,12 @@
 
 Angular standalone application for a private Serbian-language grocery catalogue, deployed as static assets with Cloudflare Wrangler.
 
+## Current functionality
+
+- Private email/password sign-in with protected application routes.
+- Custom categories and subcategories stored in Supabase.
+- Product catalogue with category grouping, search, optional brand and notes, and product details.
+
 ## Requirements
 
 - Node.js `^22.22.3`, `^24.15.0`, or `>=26.0.0`

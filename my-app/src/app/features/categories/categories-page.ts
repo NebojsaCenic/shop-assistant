@@ -1,19 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  ReactiveFormsModule,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { nonWhitespaceValidator } from '../../shared/validators/non-whitespace.validator';
 import { CategoryService } from './category.service';
 import type { Category, CategoryServiceResult, Subcategory } from './category.model';
-
-const nonWhitespace: ValidatorFn = (control: AbstractControl) =>
-  typeof control.value === 'string' && control.value.trim().length > 0
-    ? null
-    : { whitespace: true };
 
 @Component({
   imports: [ReactiveFormsModule],
@@ -38,19 +27,19 @@ export class CategoriesPage implements OnInit {
   readonly pendingSubcategoryDeleteId = signal<string | null>(null);
 
   readonly categoryForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, nonWhitespace]],
+    name: ['', [Validators.required, nonWhitespaceValidator]],
   });
   readonly categoryEditName = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, nonWhitespace],
+    validators: [Validators.required, nonWhitespaceValidator],
   });
   readonly newSubcategoryName = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, nonWhitespace],
+    validators: [Validators.required, nonWhitespaceValidator],
   });
   readonly subcategoryEditName = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, nonWhitespace],
+    validators: [Validators.required, nonWhitespaceValidator],
   });
 
   ngOnInit(): void {

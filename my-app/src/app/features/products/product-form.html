@@ -1,0 +1,88 @@
+<section class="product-form-card" [attr.aria-labelledby]="'product-form-heading'">
+  <div class="form-heading">
+    <div>
+      <p class="eyebrow">{{ product() ? 'IZMENA PROIZVODA' : 'NOVI PROIZVOD' }}</p>
+      <h2 id="product-form-heading">{{ product() ? 'Izmeni proizvod' : 'Dodaj proizvod' }}</h2>
+    </div>
+    <button class="close-button" type="button" [disabled]="isSaving()" (click)="cancelled.emit()">
+      Zatvori
+    </button>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-field">
+      <label for="product-name">Naziv proizvoda</label>
+      <input
+        id="product-name"
+        autocomplete="off"
+        formControlName="name"
+        [attr.aria-invalid]="hasError(form.controls.name)"
+        [attr.aria-describedby]="hasError(form.controls.name) ? 'product-name-error' : null"
+      />
+      @if (hasError(form.controls.name)) {
+        <span class="field-error" id="product-name-error">Unesi naziv proizvoda.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="product-category">Kategorija</label>
+      <select
+        id="product-category"
+        formControlName="categoryId"
+        [attr.aria-invalid]="hasError(form.controls.categoryId)"
+        [attr.aria-describedby]="
+          hasError(form.controls.categoryId) ? 'product-category-error' : null
+        "
+      >
+        <option value="">Izaberi kategoriju</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+      @if (hasError(form.controls.categoryId)) {
+        <span class="field-error" id="product-category-error">Izaberi kategoriju.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="product-subcategory">Potkategorija <span>(opciono)</span></label>
+      <select id="product-subcategory" formControlName="subcategoryId">
+        <option value="">Bez potkategorije</option>
+        @for (subcategory of availableSubcategories; track subcategory.id) {
+          <option [value]="subcategory.id">{{ subcategory.name }}</option>
+        }
+      </select>
+      @if (availableSubcategories.length === 0) {
+        <span class="field-hint">Ova kategorija nema potkategorije.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="product-brand">Brend <span>(opciono)</span></label>
+      <input id="product-brand" autocomplete="organization" formControlName="brand" />
+    </div>
+
+    <div class="form-field">
+      <label for="product-notes">Napomena <span>(opciono)</span></label>
+      <textarea id="product-notes" rows="3" formControlName="notes"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="primary-button" type="submit" [disabled]="isSaving()">
+        {{ isSaving() ? 'Čuvanje…' : product() ? 'Sačuvaj izmene' : 'Dodaj proizvod' }}
+      </button>
+      <button
+        class="secondary-button"
+        type="button"
+        [disabled]="isSaving()"
+        (click)="cancelled.emit()"
+      >
+        Odustani
+      </button>
+    </div>
+  </form>
+</section>
