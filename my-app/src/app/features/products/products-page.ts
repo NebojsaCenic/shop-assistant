@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CategoryService } from '../categories/category.service';
 import type { Category } from '../categories/category.model';
 import { ProductForm } from './product-form';
@@ -19,8 +19,10 @@ interface ProductGroup {
   standalone: true,
 })
 export class ProductsPage implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
+  private shouldOpenNewProductForm = this.route.snapshot.queryParamMap.get('novo') === '1';
 
   readonly categories = signal<Category[]>([]);
   readonly products = signal<Product[]>([]);
@@ -93,6 +95,10 @@ export class ProductsPage implements OnInit {
       throw error;
     } finally {
       this.isLoading.set(false);
+      if (this.shouldOpenNewProductForm && this.categories().length > 0) {
+        this.shouldOpenNewProductForm = false;
+        this.openNewProductForm();
+      }
     }
   }
 

@@ -27,11 +27,18 @@
               {
                 "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "public"
+              },
+              {
+                "glob": "icon-*.png",
+                "input": "public/icons",
+                "output": "icons"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -47,7 +54,8 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

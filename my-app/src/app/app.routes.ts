@@ -19,14 +19,8 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: placeholderPage,
-        data: {
-          eyebrow: 'TVOJA LIČNA BAZA PROIZVODA',
-          title: 'Dobro došla u Moju korpu',
-          description:
-            'Sačuvaj proizvode koje redovno kupuješ i lako ih pronađi kada ti zatrebaju.',
-          notice: 'Ovde ćeš imati pregled svoje kolekcije i brz pristup kupovini.',
-        },
+        loadComponent: () =>
+          import('./features/dashboard/dashboard-page').then((module) => module.DashboardPage),
         pathMatch: 'full',
       },
       {

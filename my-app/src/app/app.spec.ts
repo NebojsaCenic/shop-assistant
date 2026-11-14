@@ -4,6 +4,8 @@ import { signal } from '@angular/core';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { CategoryService } from './features/categories/category.service';
+import { ProductService } from './features/products/product.service';
 
 describe('App', () => {
   let authenticated: boolean;
@@ -24,6 +26,14 @@ describe('App', () => {
             signOut: async () => ({ success: true }),
             waitUntilReady: async () => undefined,
           },
+        },
+        {
+          provide: CategoryService,
+          useValue: { getCategories: async () => ({ success: true, data: [] }) },
+        },
+        {
+          provide: ProductService,
+          useValue: { getProducts: async () => ({ success: true, data: [] }) },
         },
       ],
     }).compileComponents();

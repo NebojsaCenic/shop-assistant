@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { CategoryService } from '../categories/category.service';
 import type { Category } from '../categories/category.model';
 import { ProductService } from './product.service';
@@ -7,6 +7,7 @@ import type { Product } from './product.model';
 import { ProductsPage } from './products-page';
 
 describe('ProductsPage', () => {
+  let actionQuery: string | null;
   const categories: Category[] = [
     { id: 'food', name: 'Hrana', productCount: 2, subcategories: [] },
     { id: 'home', name: 'Kućna hemija', productCount: 1, subcategories: [] },
@@ -45,10 +46,21 @@ describe('ProductsPage', () => {
   ];
 
   beforeEach(async () => {
+    actionQuery = null;
     await TestBed.configureTestingModule({
       imports: [ProductsPage],
       providers: [
         provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            get snapshot() {
+              return {
+                queryParamMap: convertToParamMap(actionQuery ? { novo: actionQuery } : {}),
+              };
+            },
+          },
+        },
         {
           provide: CategoryService,
           useValue: { getCategories: async () => ({ success: true, data: categories }) },
@@ -82,5 +94,15 @@ describe('ProductsPage', () => {
       'Hrana',
     ]);
     expect(fixture.componentInstance.productGroups()[0].products[0].name).toBe('Mleko');
+  });
+
+  it('opens the add form for the dashboard quick action after categories load', async () => {
+    actionQuery = '1';
+    const fixture = TestBed.createComponent(ProductsPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await fixture.componentInstance.loadData();
+
+    expect(fixture.componentInstance.isFormOpen()).toBe(true);
   });
 });

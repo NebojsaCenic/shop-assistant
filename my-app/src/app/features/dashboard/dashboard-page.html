@@ -1,0 +1,93 @@
+<section class="dashboard-page">
+  <header class="welcome">
+    <p class="eyebrow">TVOJA LIČNA BAZA PROIZVODA</p>
+    <h1>Dobro došla u Moju korpu</h1>
+    <p class="description">
+      Sačuvaj proizvode koje redovno kupuješ i lako ih pronađi kada ti zatrebaju.
+    </p>
+  </header>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="loading-state" role="status">Učitavanje tvoje kolekcije…</p>
+  } @else if (!hasLoadedData()) {
+    <button class="secondary-button retry-button" type="button" (click)="loadData()">
+      Pokušaj ponovo
+    </button>
+  } @else {
+    <nav class="quick-actions" aria-label="Brze akcije">
+      <a
+        class="primary-button"
+        data-testid="add-product-link"
+        routerLink="/proizvodi"
+        [queryParams]="{ novo: 1 }"
+      >
+        + Dodaj proizvod
+      </a>
+      <a class="secondary-button shopping-action" routerLink="/kupovina">Otvori kupovinu</a>
+    </nav>
+
+    <section class="stats-grid" aria-label="Pregled kolekcije">
+      <article class="stat-card">
+        <span class="stat-label">Sačuvani proizvodi</span>
+        <strong class="stat-value">{{ products().length }}</strong>
+        <a routerLink="/proizvodi">Otvori katalog</a>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Kategorije</span>
+        <strong class="stat-value">{{ categories().length }}</strong>
+        <a routerLink="/kategorije">Uredi kategorije</a>
+      </article>
+    </section>
+
+    <section class="recent-section" aria-labelledby="recent-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TVOJ KATALOG</p>
+          <h2 id="recent-heading">Nedavno dodato</h2>
+        </div>
+        @if (products().length > 0) {
+          <a class="text-link" routerLink="/proizvodi">Svi proizvodi</a>
+        }
+      </div>
+
+      @if (recentProducts().length > 0) {
+        <ul class="recent-list">
+          @for (entry of recentProducts(); track entry.product.id) {
+            <li>
+              <a class="recent-product" routerLink="/proizvodi">
+                <span class="product-copy">
+                  <span class="product-name">{{ entry.product.name }}</span>
+                  <span class="product-category">{{ entry.categoryName }}</span>
+                  @if (entry.product.brand) {
+                    <span class="product-brand">{{ entry.product.brand }}</span>
+                  }
+                </span>
+                <time [attr.datetime]="entry.product.createdAt">
+                  {{ formatDate(entry.product.createdAt) }}
+                </time>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else if (categories().length === 0) {
+        <div class="empty-state">
+          <h3>Prvo napravi svoju kategoriju.</h3>
+          <p>Kategorije ti pomažu da proizvode lakše pronađeš.</p>
+          <a class="primary-button" routerLink="/kategorije">Dodaj kategoriju</a>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>Još uvek nemaš dodatih proizvoda.</h3>
+          <p>Dodaj prvi proizvod u svoju kolekciju i pojaviće se ovde.</p>
+          <a class="primary-button" routerLink="/proizvodi" [queryParams]="{ novo: 1 }">
+            Dodaj prvi proizvod
+          </a>
+        </div>
+      }
+    </section>
+  }
+</section>
