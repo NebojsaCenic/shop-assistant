@@ -1,0 +1,309 @@
+<section class="categories-page">
+  <div class="page-heading">
+    <p class="eyebrow">ORGANIZUJ SVOJU KOLEKCIJU</p>
+    <h1>Kategorije</h1>
+    <p class="description">Organizuj proizvode u kategorije i potkategorije po svojoj meri.</p>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+  @if (successMessage(); as message) {
+    <p class="message success-message" role="status">{{ message }}</p>
+  }
+
+  <section class="category-form-card" aria-labelledby="new-category-heading">
+    <h2 id="new-category-heading">Nova kategorija</h2>
+    <form [formGroup]="categoryForm" (ngSubmit)="createCategory()">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="new-category-name">Naziv kategorije</label>
+          <input
+            id="new-category-name"
+            autocomplete="off"
+            formControlName="name"
+            [attr.aria-invalid]="hasNameError(categoryForm.controls.name)"
+            [attr.aria-describedby]="
+              hasNameError(categoryForm.controls.name) ? 'new-category-error' : null
+            "
+          />
+          @if (hasNameError(categoryForm.controls.name)) {
+            <span class="field-error" id="new-category-error">Unesi naziv kategorije.</span>
+          }
+        </div>
+        <button class="primary-button" type="submit" [disabled]="isMutating()">
+          Dodaj kategoriju
+        </button>
+      </div>
+    </form>
+  </section>
+
+  @if (isLoading()) {
+    <p class="loading-state" role="status">Učitavanje kategorija…</p>
+  } @else if (categories().length === 0 && errorMessage()) {
+    <button class="secondary-button retry-button" type="button" (click)="loadCategories()">
+      Pokušaj ponovo
+    </button>
+  } @else if (categories().length === 0) {
+    <div class="empty-state">
+      <h2>Još uvek nemaš kategorija.</h2>
+      <p>Dodaj prvu kategoriju i počni da organizuješ svoju kolekciju.</p>
+    </div>
+  } @else {
+    <div class="category-list">
+      @for (category of categories(); track category.id) {
+        <article class="category-card">
+          <div class="category-heading">
+            @if (editingCategoryId() === category.id) {
+              <form class="edit-form" (ngSubmit)="saveCategory(category)">
+                <div class="form-field">
+                  <label [for]="'edit-category-' + category.id">Naziv kategorije</label>
+                  <input
+                    [id]="'edit-category-' + category.id"
+                    [formControl]="categoryEditName"
+                    [attr.aria-invalid]="hasNameError(categoryEditName)"
+                    [attr.aria-describedby]="
+                      hasNameError(categoryEditName) ? 'edit-category-error-' + category.id : null
+                    "
+                  />
+                  @if (hasNameError(categoryEditName)) {
+                    <span class="field-error" [id]="'edit-category-error-' + category.id">
+                      Unesi naziv kategorije.
+                    </span>
+                  }
+                </div>
+                <div class="button-row">
+                  <button class="primary-button" type="submit" [disabled]="isMutating()">
+                    Sačuvaj
+                  </button>
+                  <button
+                    class="secondary-button"
+                    type="button"
+                    [disabled]="isMutating()"
+                    (click)="cancelEditingCategory()"
+                  >
+                    Odustani
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <div>
+                <h2>{{ category.name }}</h2>
+                <p class="category-meta">
+                  {{ productCountLabel(category.productCount) }}
+                  <span aria-hidden="true">·</span>
+                  {{ subcategoryCountLabel(category.subcategories.length) }}
+                </p>
+              </div>
+              <div class="button-row category-actions">
+                <button
+                  class="secondary-button"
+                  type="button"
+                  [disabled]="isMutating()"
+                  (click)="startEditingCategory(category)"
+                >
+                  Izmeni
+                </button>
+                <button
+                  class="delete-button"
+                  type="button"
+                  [disabled]="isMutating() || category.productCount > 0"
+                  [attr.aria-label]="'Obriši kategoriju ' + category.name"
+                  (click)="requestCategoryDeletion(category)"
+                >
+                  Obriši
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (category.productCount > 0) {
+            <p class="restriction-message">Kategorija ne može da se obriše dok sadrži proizvode.</p>
+          }
+
+          @if (pendingCategoryDeleteId() === category.id) {
+            <div
+              class="confirmation-panel"
+              role="alertdialog"
+              [attr.aria-label]="'Potvrda brisanja kategorije ' + category.name"
+            >
+              <p>Da li sigurno želiš da obrišeš kategoriju „{{ category.name }}“?</p>
+              <div class="button-row">
+                <button
+                  class="delete-button"
+                  type="button"
+                  [disabled]="isMutating()"
+                  (click)="deleteCategory(category)"
+                >
+                  Obriši kategoriju
+                </button>
+                <button
+                  class="secondary-button"
+                  type="button"
+                  [disabled]="isMutating()"
+                  (click)="cancelCategoryDeletion()"
+                >
+                  Odustani
+                </button>
+              </div>
+            </div>
+          }
+
+          <div class="subcategory-section">
+            <h3>Potkategorije</h3>
+            @if (category.subcategories.length === 0) {
+              <p class="subcategories-empty">Još nema potkategorija.</p>
+            } @else {
+              <ul class="subcategory-list">
+                @for (subcategory of category.subcategories; track subcategory.id) {
+                  <li class="subcategory-item">
+                    @if (editingSubcategoryId() === subcategory.id) {
+                      <form
+                        class="edit-form subcategory-edit-form"
+                        (ngSubmit)="saveSubcategory(subcategory)"
+                      >
+                        <div class="form-field">
+                          <label [for]="'edit-subcategory-' + subcategory.id">
+                            Naziv potkategorije
+                          </label>
+                          <input
+                            [id]="'edit-subcategory-' + subcategory.id"
+                            [formControl]="subcategoryEditName"
+                            [attr.aria-invalid]="hasNameError(subcategoryEditName)"
+                            [attr.aria-describedby]="
+                              hasNameError(subcategoryEditName)
+                                ? 'edit-subcategory-error-' + subcategory.id
+                                : null
+                            "
+                          />
+                          @if (hasNameError(subcategoryEditName)) {
+                            <span
+                              class="field-error"
+                              [id]="'edit-subcategory-error-' + subcategory.id"
+                            >
+                              Unesi naziv potkategorije.
+                            </span>
+                          }
+                        </div>
+                        <div class="button-row">
+                          <button class="primary-button" type="submit" [disabled]="isMutating()">
+                            Sačuvaj
+                          </button>
+                          <button
+                            class="secondary-button"
+                            type="button"
+                            [disabled]="isMutating()"
+                            (click)="cancelEditingSubcategory()"
+                          >
+                            Odustani
+                          </button>
+                        </div>
+                      </form>
+                    } @else {
+                      <span>{{ subcategory.name }}</span>
+                      <div class="button-row">
+                        <button
+                          class="secondary-button"
+                          type="button"
+                          [disabled]="isMutating()"
+                          (click)="startEditingSubcategory(subcategory)"
+                        >
+                          Izmeni
+                        </button>
+                        <button
+                          class="delete-button"
+                          type="button"
+                          [disabled]="isMutating()"
+                          [attr.aria-label]="'Obriši potkategoriju ' + subcategory.name"
+                          (click)="requestSubcategoryDeletion(subcategory)"
+                        >
+                          Obriši
+                        </button>
+                      </div>
+                    }
+
+                    @if (pendingSubcategoryDeleteId() === subcategory.id) {
+                      <div
+                        class="confirmation-panel subcategory-confirmation"
+                        role="alertdialog"
+                        [attr.aria-label]="'Potvrda brisanja potkategorije ' + subcategory.name"
+                      >
+                        <p>
+                          Da li sigurno želiš da obrišeš potkategoriju „{{ subcategory.name }}“?
+                          Proizvodi koji je koriste ostaće u kategoriji bez potkategorije.
+                        </p>
+                        <div class="button-row">
+                          <button
+                            class="delete-button"
+                            type="button"
+                            [disabled]="isMutating()"
+                            (click)="deleteSubcategory(subcategory)"
+                          >
+                            Obriši potkategoriju
+                          </button>
+                          <button
+                            class="secondary-button"
+                            type="button"
+                            [disabled]="isMutating()"
+                            (click)="cancelSubcategoryDeletion()"
+                          >
+                            Odustani
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (addingSubcategoryTo() === category.id) {
+              <form class="subcategory-form" (ngSubmit)="createSubcategory(category.id)">
+                <div class="form-field">
+                  <label [for]="'new-subcategory-' + category.id">Naziv potkategorije</label>
+                  <input
+                    [id]="'new-subcategory-' + category.id"
+                    [formControl]="newSubcategoryName"
+                    [attr.aria-invalid]="hasNameError(newSubcategoryName)"
+                    [attr.aria-describedby]="
+                      hasNameError(newSubcategoryName)
+                        ? 'new-subcategory-error-' + category.id
+                        : null
+                    "
+                  />
+                  @if (hasNameError(newSubcategoryName)) {
+                    <span class="field-error" [id]="'new-subcategory-error-' + category.id">
+                      Unesi naziv potkategorije.
+                    </span>
+                  }
+                </div>
+                <div class="button-row">
+                  <button class="primary-button" type="submit" [disabled]="isMutating()">
+                    Dodaj potkategoriju
+                  </button>
+                  <button
+                    class="secondary-button"
+                    type="button"
+                    [disabled]="isMutating()"
+                    (click)="cancelAddingSubcategory()"
+                  >
+                    Odustani
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <button
+                class="add-subcategory-button"
+                type="button"
+                [disabled]="isMutating()"
+                (click)="startAddingSubcategory(category.id)"
+              >
+                + Dodaj potkategoriju
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

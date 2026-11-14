@@ -2,6 +2,7 @@
   "name": "my-lists-app",
   "compatibility_date": "2026-11-14",
   "assets": {
-    "directory": "./public"
+    "directory": "./dist/my-lists-app/browser",
+    "not_found_handling": "single-page-application"
   }
 }

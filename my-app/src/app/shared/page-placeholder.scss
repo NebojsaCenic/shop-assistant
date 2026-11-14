@@ -1,0 +1,87 @@
+.page {
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+.page-heading {
+  padding: 18px 0 34px;
+}
+
+.eyebrow {
+  color: var(--color-brand);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-size: clamp(2rem, 8vw, 3.25rem);
+  letter-spacing: -0.06em;
+  line-height: 1.08;
+  margin: 0;
+  max-width: 620px;
+}
+
+.description {
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 18px 0 0;
+  max-width: 520px;
+}
+
+.notice-card {
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgb(34 57 42 / 5%);
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+}
+
+.notice-icon {
+  align-items: center;
+  background: var(--color-brand-soft);
+  border-radius: 13px;
+  color: var(--color-brand);
+  display: inline-flex;
+  flex: 0 0 44px;
+  height: 44px;
+  justify-content: center;
+}
+
+.notice-icon svg {
+  fill: none;
+  height: 22px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  width: 22px;
+}
+
+h2 {
+  font-size: 0.98rem;
+  letter-spacing: -0.02em;
+  margin: 2px 0 6px;
+}
+
+.notice-card p {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .page-heading {
+    padding-top: 30px;
+  }
+
+  .notice-card {
+    padding: 24px;
+  }
+}
