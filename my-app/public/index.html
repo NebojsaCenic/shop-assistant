@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Lists</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 My Lists</h1>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="todo">✅ Todo</button>
+      <button class="tab" data-tab="shopping">🛒 Shopping</button>
+      <button class="tab" data-tab="expenses">💰 Expenses</button>
+    </nav>
+
+    <section id="todo" class="panel active">
+      <form class="add-form" id="todo-form">
+        <input type="text" id="todo-input" placeholder="Add a task..." required />
+        <button type="submit">Add</button>
+      </form>
+      <ul class="list" id="todo-list"></ul>
+    </section>
+
+    <section id="shopping" class="panel">
+      <form class="add-form" id="shopping-form">
+        <input type="text" id="shopping-input" placeholder="Add an item..." required />
+        <button type="submit">Add</button>
+      </form>
+      <ul class="list" id="shopping-list"></ul>
+    </section>
+
+    <section id="expenses" class="panel">
+      <form class="add-form" id="expense-form">
+        <input type="text" id="expense-desc" placeholder="Description" required />
+        <input type="number" id="expense-amount" placeholder="Amount" step="0.01" required />
+        <button type="submit">Add</button>
+      </form>
+      <div class="total" id="expense-total"></div>
+      <ul class="list" id="expense-list"></ul>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
