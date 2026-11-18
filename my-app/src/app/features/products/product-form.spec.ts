@@ -52,7 +52,7 @@ describe('ProductForm', () => {
     expect(form.controls.subcategoryId.value).toBe('');
   });
 
-  it('requires a product name and submits normalized optional fields', async () => {
+  it('requires a product name and submits the product details', async () => {
     const fixture = TestBed.createComponent(ProductForm);
     fixture.componentRef.setInput('categories', categories);
     fixture.detectChanges();
@@ -70,8 +70,6 @@ describe('ProductForm', () => {
       name: 'Mleko',
       categoryId: 'food',
       subcategoryId: null,
-      brand: null,
-      notes: null,
     });
   });
 });

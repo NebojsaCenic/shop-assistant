@@ -1,0 +1,293 @@
+<section class="finance-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">PRIHODI I TROŠKOVI</p>
+      <h1>Finansije</h1>
+      <p class="description">Prati troškove i stanje od jedne plate do sledeće.</p>
+    </div>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="message error-message" role="alert">{{ message }}</p>
+  }
+  @if (successMessage(); as message) {
+    <p class="message success-message" role="status">{{ message }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="loading-state" role="status">Učitavanje finansija…</p>
+  } @else {
+    <section class="period-section" aria-label="Izaberi period">
+      <div class="period-modes" role="group" aria-label="Prikaz perioda">
+        <button type="button" [attr.aria-pressed]="periodMode() === 'salary'" (click)="setPeriodMode('salary')">
+          Od plate do plate
+        </button>
+        <button type="button" [attr.aria-pressed]="periodMode() === 'month'" (click)="setPeriodMode('month')">
+          Mesec
+        </button>
+        <button type="button" [attr.aria-pressed]="periodMode() === 'custom'" (click)="setPeriodMode('custom')">
+          Izabran period
+        </button>
+      </div>
+
+      @if (periodMode() === 'salary') {
+        @if (salaryPeriods().length > 0) {
+          <label class="period-control">
+            <span>Period plate</span>
+            <select [value]="selectedRange().startDate" (change)="onCycleChange($event)">
+              @for (period of salaryPeriods(); track period.startDate) {
+                <option [value]="period.startDate">
+                  {{ formatDate(period.startDate) }} – {{ formatDate(period.endDate) }}
+                </option>
+              }
+            </select>
+          </label>
+        } @else {
+          <p class="period-hint">Unesi platu da započneš prvi period. Prikazan je tekući mesec.</p>
+        }
+      } @else if (periodMode() === 'month') {
+        <label class="period-control">
+          <span>Mesec</span>
+          <input type="month" [value]="selectedMonth()" (change)="onMonthChange($event)" />
+        </label>
+      } @else {
+        <div class="custom-range">
+          <label class="period-control">
+            <span>Od</span>
+            <input type="date" [value]="customStart()" (change)="onCustomStartChange($event)" />
+          </label>
+          <label class="period-control">
+            <span>Do</span>
+            <input type="date" [value]="customEnd()" (change)="onCustomEndChange($event)" />
+          </label>
+        </div>
+      }
+    </section>
+
+    @if (!hasValidRange()) {
+      <p class="message error-message" role="alert">Početni datum mora biti pre završnog datuma.</p>
+    }
+
+    <section class="balance-strip" aria-label="Pregled stanja">
+      <article class="balance-card current-balance">
+        <span>Stanje sa prenosom</span>
+        <strong>{{ formatMoney(rangeSummary().balance) }}</strong>
+        <small>Početno stanje: {{ formatMoney(rangeSummary().openingBalance) }}</small>
+      </article>
+      <article class="balance-card">
+        <span>Prihodi u periodu</span>
+        <strong>{{ formatMoney(rangeSummary().income) }}</strong>
+      </article>
+      <article class="balance-card">
+        <span>Troškovi u periodu</span>
+        <strong>{{ formatMoney(rangeSummary().expenses) }}</strong>
+      </article>
+    </section>
+
+    <div class="finance-grid">
+      <section class="entry-panel" aria-labelledby="entry-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">{{ editingTransaction() ? 'IZMENA' : 'BRZ UNOS' }}</p>
+            <h2 id="entry-heading">{{ editingTransaction() ? 'Izmeni transakciju' : 'Nova transakcija' }}</h2>
+          </div>
+        </div>
+
+        <div class="entry-types" role="group" aria-label="Vrsta transakcije">
+          <button type="button" [attr.aria-pressed]="transactionType() === 'expense'" (click)="setTransactionType('expense')">
+            Trošak
+          </button>
+          <button type="button" [attr.aria-pressed]="transactionType() === 'salary'" (click)="setTransactionType('salary')">
+            Plata
+          </button>
+          <button type="button" [attr.aria-pressed]="transactionType() === 'other_income'" (click)="setTransactionType('other_income')">
+            Ostali prihod
+          </button>
+        </div>
+
+        <form [formGroup]="transactionForm" (ngSubmit)="saveTransaction()">
+          <div class="form-field amount-field">
+            <label for="transaction-amount">Iznos <span>RSD</span></label>
+            <input id="transaction-amount" type="number" min="0.01" step="0.01" formControlName="amount" inputmode="decimal" />
+            @if (transactionForm.controls.amount.touched && transactionForm.controls.amount.invalid) {
+              <span class="field-error">Unesi iznos veći od nule.</span>
+            }
+          </div>
+
+          @if (transactionType() === 'expense') {
+            <div class="form-field">
+              <label for="transaction-category">Kategorija</label>
+              <select id="transaction-category" formControlName="categoryId">
+                <option value="">Izaberi kategoriju</option>
+                @for (category of activeCategories(); track category.id) {
+                  <option [value]="category.id">{{ category.icon }} {{ category.name }}</option>
+                }
+              </select>
+              @if (activeCategories().length === 0) {
+                <span class="field-hint">Dodaj kategoriju troškova ispod.</span>
+              }
+              @if (transactionForm.controls.categoryId.touched && transactionForm.controls.categoryId.invalid) {
+                <span class="field-error">Izaberi kategoriju troška.</span>
+              }
+            </div>
+          }
+
+          <div class="form-field">
+            <label for="transaction-date">Datum</label>
+            <input id="transaction-date" type="date" formControlName="date" />
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-button" type="submit" [disabled]="isMutating()">
+              {{ editingTransaction() ? 'Sačuvaj izmene' : 'Sačuvaj' }}
+            </button>
+            @if (editingTransaction()) {
+              <button class="secondary-button" type="button" [disabled]="isMutating()" (click)="cancelTransactionEdit()">
+                Odustani
+              </button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <section class="chart-panel" aria-labelledby="chart-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">{{ periodMode() === 'salary' ? 'PLATNI PERIOD' : 'IZABRANI PERIOD' }}</p>
+            <h2 id="chart-heading">Struktura troškova</h2>
+          </div>
+          <span class="chart-period">{{ formatDate(selectedRange().startDate) }} – {{ formatDate(selectedRange().endDate) }}</span>
+        </div>
+
+        <div class="chart-content">
+          <div class="expense-chart" [style.background]="chartGradient()" role="img" [attr.aria-label]="'Troškovi ukupno ' + formatMoney(rangeSummary().expenses)">
+            <div class="chart-center">
+              <strong>{{ formatMoney(rangeSummary().expenses) }}</strong>
+              <span>Troškovi</span>
+            </div>
+          </div>
+          @if (rangeSummary().categoryExpenses.length > 0) {
+            <ul class="chart-legend">
+              @for (category of rangeSummary().categoryExpenses; track category.categoryId) {
+                <li>
+                  <span class="legend-icon" [style.--category-color]="category.color">{{ category.icon }}</span>
+                  <span class="legend-name">{{ category.name }}</span>
+                  <strong>{{ formatMoney(category.amount) }}</strong>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="chart-empty">Troškovi će se prikazati ovde kada ih uneseš.</p>
+          }
+        </div>
+      </section>
+    </div>
+
+    <section class="transactions-section" aria-labelledby="transactions-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{{ periodTransactions().length }} {{ transactionCountLabel(periodTransactions().length) }}</p>
+          <h2 id="transactions-heading">Transakcije</h2>
+        </div>
+      </div>
+
+      @if (periodTransactions().length === 0) {
+        <p class="transactions-empty">Nema transakcija u izabranom periodu.</p>
+      } @else {
+        <ul class="transaction-list">
+          @for (transaction of periodTransactions(); track transaction.id) {
+            <li class="transaction-row">
+              <span class="transaction-icon" [style.--category-color]="transaction.type === 'expense' ? categoryColor(transaction.categoryId ?? '') : '#39765a'">
+                {{ transaction.type === 'expense' ? categoryIcon(transaction.categoryId) : '↗' }}
+              </span>
+              <div class="transaction-copy">
+                <strong>{{ entryLabel(transaction) }}</strong>
+                <span>{{ formatDate(transaction.date) }}</span>
+              </div>
+              <strong class="transaction-amount" [class.expense-amount]="transaction.type === 'expense'" [class.income-amount]="transaction.type !== 'expense'">
+                {{ transaction.type === 'expense' ? '−' : '+' }}{{ formatMoney(transaction.amount) }}
+              </strong>
+              <div class="transaction-actions">
+                <button class="row-action edit-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Izmeni ' + entryLabel(transaction)" title="Izmeni" (click)="startTransactionEdit(transaction)">
+                  <span aria-hidden="true">✎</span>
+                </button>
+                <button class="row-action delete-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Obriši ' + entryLabel(transaction)" title="Obriši" (click)="pendingDeleteId.set(transaction.id)">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              @if (pendingDeleteId() === transaction.id) {
+                <div class="delete-confirmation" role="group" [attr.aria-label]="'Potvrda brisanja: ' + entryLabel(transaction)">
+                  <span>Obrisati ovu transakciju?</span>
+                  <button type="button" [disabled]="isMutating()" (click)="deleteTransaction(transaction)">Obriši</button>
+                  <button type="button" [disabled]="isMutating()" (click)="pendingDeleteId.set(null)">Odustani</button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="categories-section" aria-labelledby="finance-categories-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">SAMOSTALNE KATEGORIJE</p>
+          <h2 id="finance-categories-heading">Kategorije troškova</h2>
+        </div>
+      </div>
+
+      <form class="category-form" [formGroup]="categoryForm" (ngSubmit)="createCategory()">
+        <div class="form-field category-name-field">
+          <label for="finance-category-name">Nova kategorija</label>
+          <input id="finance-category-name" autocomplete="off" formControlName="name" placeholder="Na primer: Putovanja" />
+          @if (categoryForm.controls.name.touched && categoryForm.controls.name.invalid) {
+            <span class="field-error">Unesi naziv kategorije.</span>
+          }
+        </div>
+        <div class="icon-picker" role="group" aria-label="Ikonica kategorije">
+          @for (icon of categoryIcons; track icon) {
+            <button type="button" [attr.aria-label]="'Izaberi ikonicu ' + icon" [attr.aria-pressed]="selectedIcon() === icon" (click)="selectedIcon.set(icon)">
+              {{ icon }}
+            </button>
+          }
+        </div>
+        <button class="secondary-button category-add-button" type="submit" [disabled]="isMutating()">Dodaj kategoriju</button>
+      </form>
+
+      @if (activeCategories().length > 0) {
+        <ul class="finance-category-list">
+          @for (category of activeCategories(); track category.id) {
+            <li class="finance-category-row">
+              <span class="category-icon" [style.--category-color]="categoryColor(category.id)">{{ category.icon }}</span>
+              <span>{{ category.name }}</span>
+              @if (pendingArchiveId() === category.id) {
+                <span class="category-confirmation">Ukloniti?</span>
+                <button type="button" [disabled]="isMutating()" (click)="archiveCategory(category)">Da</button>
+                <button type="button" [disabled]="isMutating()" (click)="pendingArchiveId.set(null)">Ne</button>
+              } @else {
+                <button class="row-action delete-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Ukloni kategoriju ' + category.name" title="Ukloni kategoriju" (click)="pendingArchiveId.set(category.id)">
+                  <span aria-hidden="true">×</span>
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (archivedCategories().length > 0) {
+        <details class="archived-categories">
+          <summary>Arhivirane kategorije ({{ archivedCategories().length }})</summary>
+          <ul class="finance-category-list">
+            @for (category of archivedCategories(); track category.id) {
+              <li class="finance-category-row archived-category-row">
+                <span class="category-icon" [style.--category-color]="categoryColor(category.id)">{{ category.icon }}</span>
+                <span>{{ category.name }}</span>
+                <button class="secondary-button restore-button" type="button" [disabled]="isMutating()" (click)="restoreCategory(category)">Vrati</button>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </section>
+  }
+</section>

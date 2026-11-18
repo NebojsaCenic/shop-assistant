@@ -8,8 +8,6 @@ interface ProductQueryRow {
   name: string;
   category_id: string;
   subcategory_id: string | null;
-  brand: string | null;
-  notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,7 +37,7 @@ export class ProductService {
       () =>
         this.supabase
           .from('products')
-          .select('id, name, category_id, subcategory_id, brand, notes, created_at, updated_at')
+          .select('id, name, category_id, subcategory_id, created_at, updated_at')
           .eq('user_id', userId)
           .order('name', { ascending: true })
           .overrideTypes<ProductQueryRow[], { merge: false }>(),
@@ -57,8 +55,6 @@ export class ProductService {
         name: product.name,
         categoryId: product.category_id,
         subcategoryId: product.subcategory_id,
-        brand: product.brand,
-        notes: product.notes,
         createdAt: product.created_at,
         updatedAt: product.updated_at,
       })),
@@ -88,8 +84,6 @@ export class ProductService {
             name: normalized.name,
             category_id: normalized.categoryId,
             subcategory_id: normalized.subcategoryId,
-            brand: normalized.brand,
-            notes: normalized.notes,
           })
           .select('id')
           .single()
@@ -124,8 +118,6 @@ export class ProductService {
             name: normalized.name,
             category_id: normalized.categoryId,
             subcategory_id: normalized.subcategoryId,
-            brand: normalized.brand,
-            notes: normalized.notes,
           })
           .eq('user_id', userId)
           .eq('id', productId)
@@ -168,8 +160,6 @@ export class ProductService {
       name: draft.name.trim(),
       categoryId: draft.categoryId.trim(),
       subcategoryId: draft.subcategoryId?.trim() || null,
-      brand: draft.brand?.trim() || null,
-      notes: draft.notes?.trim() || null,
     };
   }
 

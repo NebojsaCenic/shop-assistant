@@ -62,9 +62,6 @@
                 <span class="product-copy">
                   <span class="product-name">{{ entry.product.name }}</span>
                   <span class="product-category">{{ entry.categoryName }}</span>
-                  @if (entry.product.brand) {
-                    <span class="product-brand">{{ entry.product.brand }}</span>
-                  }
                 </span>
                 <time [attr.datetime]="entry.product.createdAt">
                   {{ formatDate(entry.product.createdAt) }}

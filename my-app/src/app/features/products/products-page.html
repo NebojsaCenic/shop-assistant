@@ -99,14 +99,17 @@
                       <div class="product-summary">
                         <div class="product-name">
                           <h2>{{ product.name }}</h2>
-                          @if (product.brand) {
-                            <p>{{ product.brand }}</p>
-                          }
                         </div>
                         <div class="product-actions">
                           <button
-                            class="secondary-button"
+                            class="secondary-button icon-button"
                             type="button"
+                            [attr.aria-label]="
+                              expandedProductId() === product.id
+                                ? 'Sakrij detalje proizvoda ' + product.name
+                                : 'Prikaži detalje proizvoda ' + product.name
+                            "
+                            [attr.title]="expandedProductId() === product.id ? 'Sakrij detalje' : 'Detalji'"
                             [attr.aria-expanded]="expandedProductId() === product.id"
                             [attr.aria-controls]="
                               expandedProductId() === product.id
@@ -115,24 +118,27 @@
                             "
                             (click)="toggleProductDetails(product.id)"
                           >
-                            {{ expandedProductId() === product.id ? 'Sakrij detalje' : 'Detalji' }}
+                            <span aria-hidden="true">ⓘ</span>
                           </button>
                           <button
-                            class="secondary-button"
+                            class="secondary-button icon-button"
                             type="button"
+                            [attr.aria-label]="'Izmeni proizvod ' + product.name"
+                            title="Izmeni"
                             [disabled]="isMutating()"
                             (click)="openEditProductForm(product)"
                           >
-                            Izmeni
+                            <span aria-hidden="true">✎</span>
                           </button>
                           <button
-                            class="delete-button"
+                            class="delete-button icon-button"
                             type="button"
                             [disabled]="isMutating()"
                             [attr.aria-label]="'Obriši proizvod ' + product.name"
+                            title="Obriši"
                             (click)="requestProductDeletion(product)"
                           >
-                            Obriši
+                            <span aria-hidden="true">×</span>
                           </button>
                         </div>
                       </div>
@@ -144,14 +150,6 @@
                           @if (product.subcategoryId) {
                             <dt>Potkategorija</dt>
                             <dd>{{ subcategoryName(group.category, product.subcategoryId) }}</dd>
-                          }
-                          @if (product.brand) {
-                            <dt>Brend</dt>
-                            <dd>{{ product.brand }}</dd>
-                          }
-                          @if (product.notes) {
-                            <dt>Napomena</dt>
-                            <dd class="product-notes">{{ product.notes }}</dd>
                           }
                           <dt>Dodato</dt>
                           <dd>{{ formatDate(product.createdAt) }}</dd>

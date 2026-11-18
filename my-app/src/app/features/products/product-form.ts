@@ -29,8 +29,6 @@ export class ProductForm implements OnInit {
     name: ['', [Validators.required, nonWhitespaceValidator]],
     categoryId: ['', Validators.required],
     subcategoryId: [''],
-    brand: [''],
-    notes: [''],
   });
 
   constructor() {
@@ -55,8 +53,6 @@ export class ProductForm implements OnInit {
       name: product.name,
       categoryId: product.categoryId,
       subcategoryId: product.subcategoryId ?? '',
-      brand: product.brand ?? '',
-      notes: product.notes ?? '',
     });
   }
 
@@ -83,8 +79,6 @@ export class ProductForm implements OnInit {
       name: this.form.controls.name.value.trim(),
       categoryId: this.form.controls.categoryId.value,
       subcategoryId: this.form.controls.subcategoryId.value || null,
-      brand: this.form.controls.brand.value.trim() || null,
-      notes: this.form.controls.notes.value.trim() || null,
     };
 
     this.errorMessage.set(null);

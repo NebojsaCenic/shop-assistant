@@ -61,16 +61,6 @@
       }
     </div>
 
-    <div class="form-field">
-      <label for="product-brand">Brend <span>(opciono)</span></label>
-      <input id="product-brand" autocomplete="organization" formControlName="brand" />
-    </div>
-
-    <div class="form-field">
-      <label for="product-notes">Napomena <span>(opciono)</span></label>
-      <textarea id="product-notes" rows="3" formControlName="notes"></textarea>
-    </div>
-
     <div class="form-actions">
       <button class="primary-button" type="submit" [disabled]="isSaving()">
         {{ isSaving() ? 'Čuvanje…' : product() ? 'Sačuvaj izmene' : 'Dodaj proizvod' }}

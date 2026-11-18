@@ -52,6 +52,16 @@ h3 {
   color: var(--color-ink);
 }
 
+.add-button {
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.add-button:hover:not(:disabled) {
+  background: var(--color-brand-soft);
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+}
+
 .delete-button {
   background: #fff;
   border: 1px solid #ead3d1;
@@ -165,9 +175,17 @@ h3 {
 
 .purchase-toggle input {
   accent-color: var(--color-brand);
+  border-radius: 4px;
+  cursor: pointer;
   height: 22px;
   margin: 0;
+  transition: accent-color 140ms ease, box-shadow 140ms ease;
   width: 22px;
+}
+
+.purchase-toggle input:hover {
+  accent-color: var(--color-brand-dark);
+  box-shadow: 0 0 0 4px var(--color-brand-soft);
 }
 
 .checklist-product,
@@ -185,17 +203,14 @@ h3 {
   overflow-wrap: anywhere;
 }
 
-.checklist-product-category,
-.checklist-product-brand,
-.available-product-brand {
+.checklist-product-category {
   color: var(--color-muted);
   font-size: 0.8rem;
   overflow-wrap: anywhere;
 }
 
 .is-purchased .checklist-product-name,
-.is-purchased .checklist-product-category,
-.is-purchased .checklist-product-brand {
+.is-purchased .checklist-product-category {
   color: var(--color-muted);
   text-decoration: line-through;
 }

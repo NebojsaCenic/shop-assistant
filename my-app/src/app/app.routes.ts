@@ -39,6 +39,11 @@ export const routes: Routes = [
           import('./features/shopping/shopping-page').then((module) => module.ShoppingPage),
       },
       {
+        path: 'finansije',
+        loadComponent: () =>
+          import('./features/finance/finance-page').then((module) => module.FinancePage),
+      },
+      {
         path: 'profil',
         loadComponent: () =>
           import('./features/profile/profile-page').then((module) => module.ProfilePage),

@@ -44,6 +44,36 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+.icon-button {
+  border-color: transparent;
+  border-radius: 8px;
+  color: var(--color-muted);
+  font-size: 1.1rem;
+  min-height: 34px;
+  padding: 0;
+  transition: background-color 140ms ease, color 140ms ease;
+  width: 34px;
+}
+
+.icon-button:not(.delete-button):hover {
+  background: var(--color-brand-soft);
+  color: var(--color-brand-dark);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.delete-button.icon-button {
+  color: #9c625d;
+}
+
+.delete-button.icon-button:hover {
+  background: #fff1f0;
+  color: #9c2e26;
+}
+
 :focus-visible {
   outline: 3px solid #78ad8d;
   outline-offset: 3px;

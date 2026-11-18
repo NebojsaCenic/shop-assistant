@@ -57,7 +57,14 @@ describe('App', () => {
     );
 
     expect(compiled.querySelector('.brand-name')?.textContent?.trim()).toBe('Moja korpa');
-    expect(navigationLabels).toEqual(['Početna', 'Kategorije', 'Proizvodi', 'Kupovina', 'Profil']);
+    expect(navigationLabels).toEqual([
+      'Početna',
+      'Kategorije',
+      'Proizvodi',
+      'Kupovina',
+      'Finansije',
+      'Profil',
+    ]);
     expect(compiled.querySelector('h1')?.textContent?.trim()).toBe('Dobro došla u Moju korpu');
   });
 

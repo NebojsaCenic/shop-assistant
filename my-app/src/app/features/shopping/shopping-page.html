@@ -64,9 +64,6 @@
               <div class="checklist-product">
                 <span class="checklist-product-name">{{ entry.product.name }}</span>
                 <span class="checklist-product-category">{{ entry.category.name }}</span>
-                @if (entry.product.brand) {
-                  <span class="checklist-product-brand">{{ entry.product.brand }}</span>
-                }
               </div>
               <button
                 class="secondary-button remove-button"
@@ -155,9 +152,6 @@
                     <li class="available-product">
                       <div class="available-product-info">
                         <span class="available-product-name">{{ product.name }}</span>
-                        @if (product.brand) {
-                          <span class="available-product-brand">{{ product.brand }}</span>
-                        }
                       </div>
                       <button
                         class="secondary-button add-button"

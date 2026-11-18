@@ -6,8 +6,9 @@ Angular standalone application for a private Serbian-language grocery catalogue,
 
 - Private email/password sign-in with protected application routes.
 - Custom categories and subcategories stored in Supabase.
-- Product catalogue with category grouping, search, optional brand and notes, and product details.
+- Product catalogue with category grouping, search, and product details.
 - Active shopping checklist with product selection, purchased states, individual removal, and clearing.
+- Finance tracking with independent expense categories, salary periods, RSD balances, and spending charts.
 - Dashboard with collection statistics, recently added products, and quick actions.
 - Installable PWA with app-shell caching; Supabase data remains online-only.
 
@@ -52,4 +53,4 @@ npm run db:status
 npm run db:push
 ```
 
-The database password and Supabase personal access token are entered only in the CLI; do not commit them or place them in frontend configuration.
+The database password and Supabase personal access token are entered only in the CLI; do not commit them or place them in frontend configuration. Apply the finance migration before opening the Finance section in a deployed environment.

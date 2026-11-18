@@ -48,13 +48,14 @@ Do not introduce unnecessary libraries or architectural complexity.
 
 ## 3. Application Navigation
 
-Use a mobile bottom navigation bar with five sections:
+Use a mobile bottom navigation bar with six sections:
 
 1. Početna
 2. Kategorije
 3. Proizvodi
 4. Kupovina
-5. Profil
+5. Finansije
+6. Profil
 
 The navigation should remain accessible throughout the application after authentication.
 
@@ -144,8 +145,6 @@ Each product should contain:
 - name: string (required).
 - category_id: UUID (required).
 - subcategory_id: UUID (optional).
-- brand: string (optional).
-- notes: string (optional).
 - created_at: timestamp.
 - updated_at: timestamp.
 
@@ -158,8 +157,6 @@ The product creation form should contain:
 - Naziv proizvoda (required).
 - Kategorija (required).
 - Potkategorija (optional).
-- Brend (optional).
-- Napomena (optional).
 
 The category selector should display the user's existing categories.
 
@@ -209,6 +206,21 @@ Include:
 - Basic account settings.
 
 Keep this section minimal.
+
+### 3.6 Finansije (Finance)
+
+Provide a separate personal-finance section. Finance categories must be independent of grocery product categories.
+
+Required functionality:
+- Record expenses with an amount, category and date, in RSD.
+- Record income as either Plata or Ostali prihod. Plata starts a new salary period; Ostali prihod increases the balance without starting a period.
+- Carry the previous period's remaining balance into the next salary period.
+- Show salary-to-salary, calendar-month and custom-date-range summaries.
+- Visualize expenses by category and show transaction history.
+- Allow users to add and remove finance categories with icons.
+- Allow transactions to be edited and deleted.
+
+Do not add payment methods or transaction notes in the initial version.
 
 ## 4. Authentication
 
@@ -269,6 +281,29 @@ Use the product data model defined in section 3.3.
 - product_id (UUID).
 - is_purchased (boolean, default false).
 - created_at.
+
+### finance_categories
+
+- id (UUID).
+- user_id (UUID).
+- name (string).
+- icon (string).
+- is_active (boolean, default true).
+- created_at.
+
+Archived categories must remain available to historical transactions.
+
+### finance_transactions
+
+- id (UUID).
+- user_id (UUID).
+- type (expense, salary or other_income).
+- amount (positive numeric amount in RSD).
+- category_id (required for expenses, null for income).
+- transaction_date (date).
+- created_at.
+
+Salary transactions define pay-period start dates. The balance is derived from all income and expense transactions so previous savings carry forward.
 
 Use appropriate foreign keys, indexes and constraints.
 
@@ -365,6 +400,7 @@ src/app/
   - categories/
   - products/
   - shopping/
+  - finance/
   - profile/
 - layout/
   - bottom-navigation/

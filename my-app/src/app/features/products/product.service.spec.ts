@@ -84,8 +84,6 @@ describe('ProductService', () => {
             name: 'Mleko',
             category_id: 'category-id',
             subcategory_id: null,
-            brand: 'Mlekara',
-            notes: null,
             created_at: '2026-11-14T12:00:00Z',
             updated_at: '2026-11-14T12:00:00Z',
           },
@@ -104,8 +102,6 @@ describe('ProductService', () => {
           name: 'Mleko',
           categoryId: 'category-id',
           subcategoryId: null,
-          brand: 'Mlekara',
-          notes: null,
           createdAt: '2026-11-14T12:00:00Z',
           updatedAt: '2026-11-14T12:00:00Z',
         },
@@ -114,13 +110,11 @@ describe('ProductService', () => {
     expect(from).toHaveBeenCalledWith('products');
   });
 
-  it('trims product text and stores empty optional fields as null', async () => {
+  it('trims product text and inserts only supported fields', async () => {
     const result = await TestBed.inject(ProductService).createProduct({
       name: '  Mleko  ',
       categoryId: 'category-id',
       subcategoryId: null,
-      brand: '  ',
-      notes: '',
     });
 
     expect(result).toEqual({ success: true, data: { id: 'product-id' } });
@@ -129,8 +123,6 @@ describe('ProductService', () => {
       name: 'Mleko',
       category_id: 'category-id',
       subcategory_id: null,
-      brand: null,
-      notes: null,
     });
   });
 
@@ -146,8 +138,6 @@ describe('ProductService', () => {
       name: 'Mleko',
       categoryId: 'missing-category',
       subcategoryId: null,
-      brand: null,
-      notes: null,
     });
 
     expect(result).toEqual({

@@ -176,7 +176,7 @@ h1 {
 
 .category-name {
   flex: 1;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 750;
   overflow-wrap: anywhere;
 }
@@ -222,16 +222,10 @@ h1 {
 }
 
 .product-name h2 {
-  font-size: 0.98rem;
-  letter-spacing: -0.02em;
+  font-size: 0.92rem;
+  font-weight: 600;
   margin: 0;
   overflow-wrap: anywhere;
-}
-
-.product-name p {
-  color: var(--color-muted);
-  font-size: 0.82rem;
-  margin: 5px 0 0;
 }
 
 .product-actions,
@@ -261,10 +255,6 @@ h1 {
   font-size: 0.86rem;
   margin: 0;
   overflow-wrap: anywhere;
-}
-
-.product-notes {
-  white-space: pre-wrap;
 }
 
 .confirmation-panel {

@@ -103,21 +103,24 @@
               </div>
               <div class="button-row category-actions">
                 <button
-                  class="secondary-button"
+                  class="secondary-button icon-button"
                   type="button"
+                  [attr.aria-label]="'Izmeni kategoriju ' + category.name"
+                  title="Izmeni"
                   [disabled]="isMutating()"
                   (click)="startEditingCategory(category)"
                 >
-                  Izmeni
+                  <span aria-hidden="true">✎</span>
                 </button>
                 <button
-                  class="delete-button"
+                  class="delete-button icon-button"
                   type="button"
                   [disabled]="isMutating() || category.productCount > 0"
                   [attr.aria-label]="'Obriši kategoriju ' + category.name"
+                  title="Obriši"
                   (click)="requestCategoryDeletion(category)"
                 >
-                  Obriši
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
             }
@@ -210,21 +213,24 @@
                       <span>{{ subcategory.name }}</span>
                       <div class="button-row">
                         <button
-                          class="secondary-button"
+                          class="secondary-button icon-button"
                           type="button"
+                          [attr.aria-label]="'Izmeni potkategoriju ' + subcategory.name"
+                          title="Izmeni"
                           [disabled]="isMutating()"
                           (click)="startEditingSubcategory(subcategory)"
                         >
-                          Izmeni
+                          <span aria-hidden="true">✎</span>
                         </button>
                         <button
-                          class="delete-button"
+                          class="delete-button icon-button"
                           type="button"
                           [disabled]="isMutating()"
                           [attr.aria-label]="'Obriši potkategoriju ' + subcategory.name"
+                          title="Obriši"
                           (click)="requestSubcategoryDeletion(subcategory)"
                         >
-                          Obriši
+                          <span aria-hidden="true">×</span>
                         </button>
                       </div>
                     }

@@ -3,8 +3,6 @@ export interface Product {
   name: string;
   categoryId: string;
   subcategoryId: string | null;
-  brand: string | null;
-  notes: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,8 +11,6 @@ export interface ProductDraft {
   name: string;
   categoryId: string;
   subcategoryId: string | null;
-  brand: string | null;
-  notes: string | null;
 }
 
 export type ProductServiceResult<T> =
