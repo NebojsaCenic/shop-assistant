@@ -8,7 +8,7 @@ Angular standalone application for a private Serbian-language grocery catalogue,
 - Custom categories and subcategories stored in Supabase.
 - Product catalogue with category grouping, search, and product details.
 - Active shopping checklist with product selection, purchased states, individual removal, and clearing.
-- Finance tracking with independent expense categories, salary periods, RSD balances, and spending charts.
+- Finance tracking with independent expense categories, editable category names and icons, salary periods, RSD balances, and spending charts with matching category-color legend dots.
 - Dashboard with collection statistics, recently added products, and quick actions.
 - Installable PWA with app-shell caching; Supabase data remains online-only.
 

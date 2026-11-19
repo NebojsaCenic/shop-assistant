@@ -171,7 +171,10 @@
               @for (category of rangeSummary().categoryExpenses; track category.categoryId) {
                 <li>
                   <span class="legend-icon" [style.--category-color]="category.color">{{ category.icon }}</span>
-                  <span class="legend-name">{{ category.name }}</span>
+                  <span class="legend-name">
+                    <span class="legend-color-dot" [style.background-color]="category.color" aria-hidden="true"></span>
+                    <span>{{ category.name }}</span>
+                  </span>
                   <strong>{{ formatMoney(category.amount) }}</strong>
                 </li>
               }
@@ -244,13 +247,16 @@
             <span class="field-error">Unesi naziv kategorije.</span>
           }
         </div>
-        <div class="icon-picker" role="group" aria-label="Ikonica kategorije">
-          @for (icon of categoryIcons; track icon) {
-            <button type="button" [attr.aria-label]="'Izaberi ikonicu ' + icon" [attr.aria-pressed]="selectedIcon() === icon" (click)="selectedIcon.set(icon)">
-              {{ icon }}
-            </button>
-          }
-        </div>
+        <details class="icon-picker-details">
+          <summary>Ikonica: {{ selectedIcon() }}</summary>
+          <div class="icon-picker" role="group" aria-label="Ikonica kategorije">
+            @for (icon of categoryIcons; track icon) {
+              <button type="button" [attr.aria-label]="'Izaberi ikonicu ' + icon" [attr.aria-pressed]="selectedIcon() === icon" (click)="selectedIcon.set(icon)">
+                {{ icon }}
+              </button>
+            }
+          </div>
+        </details>
         <button class="secondary-button category-add-button" type="submit" [disabled]="isMutating()">Dodaj kategoriju</button>
       </form>
 
@@ -260,14 +266,39 @@
             <li class="finance-category-row">
               <span class="category-icon" [style.--category-color]="categoryColor(category.id)">{{ category.icon }}</span>
               <span>{{ category.name }}</span>
+              <button class="row-action edit-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Izmeni kategoriju ' + category.name" title="Izmeni kategoriju" (click)="startCategoryEdit(category)">
+                <span aria-hidden="true">✎</span>
+              </button>
               @if (pendingArchiveId() === category.id) {
                 <span class="category-confirmation">Ukloniti?</span>
                 <button type="button" [disabled]="isMutating()" (click)="archiveCategory(category)">Da</button>
                 <button type="button" [disabled]="isMutating()" (click)="pendingArchiveId.set(null)">Ne</button>
               } @else {
-                <button class="row-action delete-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Ukloni kategoriju ' + category.name" title="Ukloni kategoriju" (click)="pendingArchiveId.set(category.id)">
+                <button class="row-action delete-action" type="button" [disabled]="isMutating()" [attr.aria-label]="'Ukloni kategoriju ' + category.name" title="Ukloni kategoriju" (click)="editingCategoryId.set(null); pendingArchiveId.set(category.id)">
                   <span aria-hidden="true">×</span>
                 </button>
+              }
+              @if (editingCategoryId() === category.id) {
+                <div class="category-editor">
+                  <div class="form-field">
+                    <label [for]="'edit-category-name-' + category.id">Naziv kategorije</label>
+                    <input [id]="'edit-category-name-' + category.id" [formControl]="editingCategoryName" autocomplete="off" />
+                    @if (editingCategoryName.touched && editingCategoryName.invalid) {
+                      <span class="field-error" role="alert">Unesi naziv kategorije.</span>
+                    }
+                  </div>
+                  <div class="icon-picker" role="group" [attr.aria-label]="'Ikonica kategorije ' + category.name">
+                    @for (icon of categoryIcons; track icon) {
+                      <button type="button" [disabled]="isMutating()" [attr.aria-label]="'Izaberi ikonicu ' + icon" [attr.aria-pressed]="editingCategoryIcon() === icon" (click)="editingCategoryIcon.set(icon)">
+                        {{ icon }}
+                      </button>
+                    }
+                  </div>
+                  <div class="form-actions">
+                    <button class="primary-button" type="button" [disabled]="isMutating()" (click)="saveCategory(category)">Sačuvaj izmene</button>
+                    <button class="secondary-button" type="button" [disabled]="isMutating()" (click)="editingCategoryId.set(null)">Odustani</button>
+                  </div>
+                </div>
               }
             </li>
           }

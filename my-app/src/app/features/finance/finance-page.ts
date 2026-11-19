@@ -46,11 +46,17 @@ export class FinancePage implements OnInit {
   readonly pendingDeleteId = signal<string | null>(null);
   readonly pendingArchiveId = signal<string | null>(null);
   readonly selectedIcon = signal(DEFAULT_FINANCE_CATEGORIES[0].icon);
+  readonly editingCategoryId = signal<string | null>(null);
+  readonly editingCategoryIcon = signal('');
   readonly categoryIcons = FINANCE_CATEGORY_ICONS;
 
   readonly categoryForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, nonWhitespaceValidator]],
   });
+  readonly editingCategoryName = this.formBuilder.nonNullable.control('', [
+    Validators.required,
+    nonWhitespaceValidator,
+  ]);
   readonly transactionForm = this.formBuilder.group({
     amount: this.formBuilder.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
     categoryId: this.formBuilder.nonNullable.control('', Validators.required),
@@ -274,6 +280,42 @@ export class FinancePage implements OnInit {
       }
       this.categoryForm.reset({ name: '' });
       this.successMessage.set('Kategorija je dodata.');
+      await this.refreshData(false);
+    } finally {
+      this.isMutating.set(false);
+    }
+  }
+
+  startCategoryEdit(category: FinanceCategory): void {
+    this.pendingArchiveId.set(null);
+    this.editingCategoryId.set(category.id);
+    this.editingCategoryName.reset(category.name);
+    this.editingCategoryIcon.set(category.icon);
+    this.clearMessages();
+  }
+
+  async saveCategory(category: FinanceCategory): Promise<void> {
+    if (this.isMutating()) {
+      return;
+    }
+    this.editingCategoryName.markAsTouched();
+    if (this.editingCategoryName.invalid) {
+      return;
+    }
+
+    this.isMutating.set(true);
+    this.clearMessages();
+    try {
+      const result = await this.financeService.updateCategory(category.id, {
+        name: this.editingCategoryName.value.trim(),
+        icon: this.editingCategoryIcon(),
+      });
+      if (!result.success) {
+        this.errorMessage.set(result.message);
+        return;
+      }
+      this.editingCategoryId.set(null);
+      this.successMessage.set('Kategorija je izmenjena.');
       await this.refreshData(false);
     } finally {
       this.isMutating.set(false);

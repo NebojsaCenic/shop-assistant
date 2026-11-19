@@ -146,4 +146,38 @@ describe('FinanceService', () => {
     expect(from).toHaveBeenCalledWith('finance_categories');
     expect(updatedRow).toEqual({ is_active: false });
   });
+
+  it('updates the name and icon of only the selected user-owned category', async () => {
+    const builder = createQueryBuilder(
+      { data: { id: 'category-id' }, error: null },
+      undefined,
+      (row) => (updatedRow = row),
+    );
+    const eq = vi.spyOn(builder, 'eq');
+    from.mockReturnValue(builder);
+
+    const result = await TestBed.inject(FinanceService).updateCategory('category-id', {
+      name: ' Higijena ',
+      icon: '🧼',
+    });
+
+    expect(result).toEqual({ success: true, data: { id: 'category-id' } });
+    expect(updatedRow).toEqual({ name: 'Higijena', icon: '🧼' });
+    expect(eq).toHaveBeenCalledWith('user_id', 'owner-id');
+    expect(eq).toHaveBeenCalledWith('id', 'category-id');
+  });
+
+  it('rejects empty icons without updating a category', async () => {
+    const result = await TestBed.inject(FinanceService).updateCategory('category-id', { name: 'Hrana', icon: ' ' });
+
+    expect(result.success).toBe(false);
+    expect(from).not.toHaveBeenCalled();
+  });
+
+  it('rejects whitespace-only category names without a database request', async () => {
+    const result = await TestBed.inject(FinanceService).updateCategory('category-id', { name: '   ', icon: '🧼' });
+
+    expect(result.success).toBe(false);
+    expect(from).not.toHaveBeenCalled();
+  });
 });

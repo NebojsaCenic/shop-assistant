@@ -118,6 +118,32 @@ export class FinanceService {
     );
   }
 
+  async updateCategory(categoryId: string, draft: FinanceCategoryDraft): Promise<FinanceServiceResult<{ id: string }>> {
+    const name = draft.name.trim();
+    const icon = draft.icon.trim();
+    if (!name || !icon) {
+      return { success: false, message: 'Unesi naziv i izaberi ikonicu kategorije.' };
+    }
+
+    const userId = this.getUserId();
+    if (!userId) {
+      return { success: false, message: 'Prijavi se da bi izmenila kategoriju.' };
+    }
+
+    return this.execute<{ id: string }>(
+      () =>
+        this.supabase
+          .from('finance_categories')
+          .update({ name, icon })
+          .eq('user_id', userId)
+          .eq('id', categoryId)
+          .select('id')
+          .single()
+          .overrideTypes<{ id: string }, { merge: false }>(),
+      'Kategorija nije sačuvana. Proveri internet vezu i pokušaj ponovo.',
+    );
+  }
+
   async archiveCategory(categoryId: string): Promise<FinanceServiceResult<{ id: string } | null>> {
     const userId = this.getUserId();
     if (!userId) {
